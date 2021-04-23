@@ -54,6 +54,8 @@
 </template>
 
 <script>
+import { execScript } from "./services";
+
 export default {
   name: "App",
   data() {
@@ -106,9 +108,9 @@ export default {
     },
     handleSelect(item) {
       this.selectedChampion = item || null;
-      this.getEnvConfig();
+      this.getEnvConfig(Number(item.key));
     },
-    getEnvConfig() {
+    getEnvConfig(championId) {
       fetch("/config")
         .then((response) => {
           return response.json();
@@ -119,18 +121,21 @@ export default {
             this.port = port;
             this.token = token;
             this.backEndWebsite = `https://127.0.0.1:${port}`;
-            this.$alert(
-              "是否前往后台？",
-              `${this.selectedChampion.name} ${this.selectedChampion.title}`,
-              {
-                confirmButtonText: "确定",
-                showCancelButton: true,
-              }
-            ).then((action) => {
-              if (action === "confirm") {
-                window.open(this.backEndWebsite);
-              }
-            });
+            // this.$alert(
+            //   "是否前往后台？",
+            //   `${this.selectedChampion.name} ${this.selectedChampion.title}`,
+            //   {
+            //     confirmButtonText: "确定",
+            //     showCancelButton: true,
+            //   }
+            // ).then((action) => {
+            //   if (action === "confirm") {
+            //     window.open(this.backEndWebsite);
+            //   }
+            // });
+            execScript({scriptName: 'pickChampion', params: [championId]}).then(res => {
+              console.log(res)
+            })
           } else {
             this.token = null;
             this.backEndWebsite = null;
@@ -215,10 +220,14 @@ body {
 }
 
 .champion-wrapper .champion img {
-  width: 100px;
+  width: 85px;
 }
 .champion-wrapper .champion .name {
   text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: "Mircosoft Yahei";
+  margin-top: 5px;
 }
 .champion-wrapper .champion {
   cursor: pointer;
@@ -226,6 +235,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-bottom: 10px;
 }
 
 ::-webkit-scrollbar {
